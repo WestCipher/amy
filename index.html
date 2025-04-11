@@ -294,6 +294,10 @@
       } else if (specialResponses[input]) {
         botMsg.textContent = specialResponses[input];
       } else if (input === 'fire the cannon') {
+        const cannonSound = document.getElementById("cannonSound");
+        cannonSound.currentTime = 0;
+        cannonSound.volume = 0.5;
+        cannonSound.play();
         triggerCannonCountdown();
         return;
       } else {
@@ -323,11 +327,7 @@
       let count = 10;
 
       const interval = setInterval(() => {
-        if (count === 5) {
-          const cannonSound = document.getElementById('cannonSound');
-          cannonSound.currentTime = 0;
-          cannonSound.play();
-        }
+        
 
         if (count >= 0) {
           countdown.textContent = count;
