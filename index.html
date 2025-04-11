@@ -256,7 +256,7 @@
 
     function handleInput() {
       const inputVal = document.getElementById('userInput').value.trim().toLowerCase();
-      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle'];
+      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy'];
       const enterSound = document.getElementById("enterSound");
       const specialSound = document.getElementById("specialSound");
 
@@ -293,7 +293,16 @@
         }
       } else if (specialResponses[input]) {
         botMsg.textContent = specialResponses[input];
-      } else if (input === 'fire the cannon') {
+      
+  } else if (input === 'yogurt mommy') {
+    const yogurtImage = document.createElement('img');
+    yogurtImage.src = 'yogurt.jpg';
+    yogurtImage.style.maxWidth = '300px';
+    yogurtImage.style.display = 'block';
+    yogurtImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(yogurtImage);
+} else if (input === 'fire the cannon') {
         const cannonSound = document.getElementById("cannonSound");
         cannonSound.currentTime = 0;
         cannonSound.volume = 0.5;
