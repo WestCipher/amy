@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.M.Y.S. Transmission Terminal</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #00ffcc;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 20px;
+    }
+
+    select, input, button {
+      background: #1a1a1a;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      padding: 10px;
+      margin: 5px;
+    }
+
+    #chat {
+      background: #1a1a1a;
+      padding: 15px;
+      margin-top: 20px;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #00ffcc;
+      white-space: pre-wrap;
+      font-size: 10px;
+    }
+
+    .message {
+      margin: 10px 0;
+    }
+
+    .user { color: #ffff99; }
+    .bot { color: #00ffcc; }
+
+    #countdownContainer {
+      display: none;
+      text-align: center;
+      font-size: 100px;
+      margin-top: 30px;
+    }
+
+    @keyframes strobe {
+      0%, 100% { opacity: 1; }
+      25% { opacity: 0.2; }
+      50% { opacity: 1; }
+      75% { opacity: 0.2; }
+    }
+
+    .fire-strobe {
+      animation: strobe 0.15s infinite;
+      color: red;
+      text-shadow: 0 0 20px orange, 0 0 40px yellow;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      10% { transform: translate(-1px, -2px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(3px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      70% { transform: translate(3px, 1px) rotate(-1deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      90% { transform: translate(1px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+
+    .shake {
+      animation: shake 0.5s;
+      animation-iteration-count: 4;
+    }
+
+    .glitch-char {
+      position: fixed;
+      font-size: 24px;
+      font-weight: bold;
+      color: #00ffcc;
+      pointer-events: none;
+      animation: flicker 0.2s infinite alternate;
+      z-index: 2000;
+    }
+
+    @keyframes flicker {
+      from { opacity: 0.2; transform: scale(0.9) rotate(-5deg); }
+      to { opacity: 1; transform: scale(1.1) rotate(5deg); }
+    }
+
+    #flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3000;
+}
+
+    @keyframes flashBang {
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .flash-active {
+      animation: flashBang 0.3s ease-out;
+    }
+  
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-out forwards;
+}
+
+
+#missionComplete {
+  margin-top: -120px;
+  display: none;
+  text-align: center;
+  font-size: 100px;
+  color: #00ffcc;
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+
+@keyframes pulseGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+  }
+  50% {
+    text-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc, 0 0 60px #00ffcc;
+  }
+}
+
+.glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+
+
+#happyBirthday {
+  margin-top: 10px;
+  display: none;
+  text-align: center;
+  font-size: 48px;
+  color: #00ffcc;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+  margin-top: 30px;
+}
+
+
+
+#laserImpact {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("planet_laser_hit.png") no-repeat center center;
+  background-size: cover;
+  z-index: 2500;
+  animation: fadeOutImage 3s ease-out forwards;
+}
+
+@keyframes fadeOutImage {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+</style>
+</head>
+<body id="body">
+  <h1>A.M.Y.S. Transmission Interface</h1>
+  <label for="transmissionSelect">Select Transmission:</label>
+  <select id="transmissionSelect">
+    <option value="transmission1">Transmission 1: The Signal Begins</option>
+    <option value="transmission2">Transmission 2: To the Stars</option>
+    <option value="transmission5">Transmission 5: [REDACTED]</option>
+    <option value="transmission6">Transmission 6: Cipher</option>
+  </select><br>
+
+  <input type="text" id="userInput" placeholder="Type 'hint' or... something else?">
+  <button onclick="handleInput()">Send</button>
+
+  <div id="chat"></div>
+
+  <div id="countdownContainer">
+    <span id="countdown"></span>
+  </div>
+
+  <audio id="cannonSound" src="cannon_sound.wav" preload="auto"></audio>
+
+  <script>
+    document.getElementById('userInput').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        const enterSound = document.getElementById("enterSound");
+        enterSound.volume = 0.25;
+        enterSound.play();
+        handleInput();
+      }
+    });
+
+    const transmissions = {
+      transmission6: [
+        "This message was definitely intended for Agent Finkle. It confirms her defection… something about space plants? Still, it feels like there’s enough intel here to crack the code.",
+        "Wow. Nerds. The transmission appears to be written in Aurebesh—the Star Wars alphabet. Looks like the aliens were pointing her to a specific location online."
+      ],
+      transmission5: [
+        "Redacted lines. Tampered data. Focus not on what’s there—but what isn’t. Four transmissions before this one, each interfered with.",
+        "Records suggest Agent Finkle is behind the censorship. But perhaps the true clue lies not in what was hidden, but in how *much* was hidden.",
+        "Transmission #1 has three redacted segments. Find the redacted count in the others. The pattern matters: 3 _ _ _."
+      ],
+      transmission1: [
+        "They say some extraterrestrials perceive sound as light. Perhaps, with the right tools, we can see what they hear.",
+        "A.M.Y.S. budget is low being top secret and funding don’t mix … but free tech might do the trick. Search the open web.",
+        "Try a spectrum analyzer—like the one on academo.org. Feed the transmission through it. Codes may emerge."
+      ],
+      transmission2: [
+        "Everything you need is written in the stars. Maybe we can capitalize on that—especially when paired with the transmission data.",
+        "Binary Light Analysis Celestial Knowledge and Location Identification Glowing Hidden Transmissions. Long. Overcomplicated. Possibly a code?",
+        "Some truths hide in plain light. Others... require black light. Try scanning the stars again—something might glow."
+      ]
+    };
+
+    let currentHints = [];
+    let hintIndex = 0;
+
+    const specialResponses = {
+      'amy': "Agent A.M.Y. is classified. But since you asked… she’s not just an algorithm. She’s listening. Always.",
+      'nathan': "Supreme overlord of the cosmos, master of time, space, and vibes. A being of brilliance unmatched in the past, unrivaled in the present, and destined to rule in the future.",
+      'help': "Help request acknowledged. A recovery team will arrive... sometime between now and the death of the universe.",
+      'buzz': "The species known as 'Buzz' is unusually aggressive for its size. Recommend caution and a firm tone.",
+      'nugget': "Species: Nugget. Cognitive sharpness... questionable. Cuteness levels: dangerously high.",
+      'shannon': "I am not programmed to feel emotions. But whoever wrote this code gets a warm feeling inside when 'Shannon' appears.",
+      'val': "404: Identity not found. Please consult Galactic Landlord John in the Afterlife Galaxy for clearance-level clarification.",
+      'gamera': "Gamera, the Shelled One who created Earth.",
+      'alien': "Those guys are totally chill. Absolutely no intention of harnessing Earth's deliciously warm, energy-rich core. Nope, none at all. All hail supreme Lord Zenu!",
+      'finkle': "Lover of plants and knowledge. Thrower of some of the best parties on Earth."
+    };
+
+    function handleInput() {
+      const inputVal = document.getElementById('userInput').value.trim().toLowerCase();
+      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle'];
+      const enterSound = document.getElementById("enterSound");
+      const specialSound = document.getElementById("specialSound");
+
+      if (specialInputs.includes(inputVal)) {
+        specialSound.volume = 0.25;
+        specialSound.play();
+      } else {
+        enterSound.volume = 0.25;
+        enterSound.play();
+      }
+      
+      const input = document.getElementById('userInput').value.trim().toLowerCase();
+      const chat = document.getElementById('chat');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.textContent = '> ' + input;
+      chat.appendChild(userMsg);
+
+      const transmission = document.getElementById('transmissionSelect').value;
+      if (currentHints !== transmissions[transmission]) {
+        currentHints = transmissions[transmission];
+        hintIndex = 0;
+      }
+
+      const botMsg = document.createElement('div');
+      botMsg.className = 'message bot';
+
+      if (input === 'hint') {
+        if (hintIndex < currentHints.length) {
+          botMsg.textContent = currentHints[hintIndex];
+          hintIndex++;
+        } else {
+          botMsg.textContent = "No further hints available for this transmission.";
+        }
+      } else if (specialResponses[input]) {
+        botMsg.textContent = specialResponses[input];
+      } else if (input === 'fire the cannon') {
+        const cannonSound = document.getElementById("cannonSound");
+        cannonSound.currentTime = 0;
+        cannonSound.volume = 0.5;
+        cannonSound.play();
+        triggerCannonCountdown();
+        return;
+      } else {
+        botMsg.textContent = "Command not recognized. Try typing 'hint'.";
+      }
+
+      chat.appendChild(botMsg);
+      document.getElementById('userInput').value = '';
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function triggerCannonCountdown() {
+      const specialSound = document.getElementById("specialSound");
+      specialSound.volume = 0.25;
+      specialSound.play();
+      const countdownStartSound = document.getElementById("countdownStartSound");
+      countdownStartSound.volume = 0.5;
+      countdownStartSound.play();
+      const chat = document.getElementById('chat');
+      const countdownContainer = document.getElementById('countdownContainer');
+      const countdown = document.getElementById('countdown');
+
+      chat.style.display = 'none';
+      countdownContainer.style.display = 'block';
+      countdown.classList.remove("fire-strobe");
+
+      let count = 10;
+
+      const interval = setInterval(() => {
+        
+
+        if (count >= 0) {
+          countdown.textContent = count;
+          count--;
+        } else {
+          clearInterval(interval);
+          countdown.textContent = "FIRE";
+          document.getElementById("laserImpact").style.display = "block";
+          countdown.classList.add("fire-strobe");
+
+          // Fade out after 4 seconds
+          setTimeout(() => {
+            countdown.classList.add("fade-out");
+          }, 4000);
+          // Show 'MISSION COMPLETE' after fade
+          setTimeout(() => {
+            const missionMsg = document.getElementById('missionComplete');
+            missionMsg.style.display = 'block';
+            missionMsg.classList.add("glow");
+            setTimeout(() => {
+              missionMsg.style.opacity = '1';
+            }, 50);
+
+            // Show 'HAPPY BIRTHDAY' 1 second after MISSION COMPLETE fades in
+            setTimeout(() => {
+              const birthdayMsg = document.getElementById('happyBirthday');
+              birthdayMsg.style.display = 'block';
+              setTimeout(() => {
+                birthdayMsg.style.opacity = '1';
+              }, 50);
+            }, 2500);
+          }, 5000);
+
+
+          const flash = document.getElementById('flash');
+          flash.classList.add('flash-active');
+          setTimeout(() => flash.classList.remove('flash-active'), 300);
+
+          const body = document.getElementById('body');
+          body.classList.add('shake');
+          setTimeout(() => body.classList.remove('shake'), 3000);
+
+          spawnGlitchChars(75);
+        }
+      }, 1000);
+    }
+
+    function spawnGlitchChars(amount) {
+      const chars = '!@#$%^&*()_+=-{}[]|;:<>,.?/~ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      for (let i = 0; i < amount; i++) {
+        const char = document.createElement('div');
+        char.className = 'glitch-char';
+        char.textContent = chars[Math.floor(Math.random() * chars.length)];
+        char.style.left = Math.random() * 100 + 'vw';
+        char.style.top = Math.random() * 100 + 'vh';
+        document.body.appendChild(char);
+        setTimeout(() => char.remove(), 2000 + Math.random() * 2000);
+      }
+    }
+  </script>
+  <div id="missionComplete">MISSION COMPLETE</div>
+  <div id="happyBirthday">Happy Birthday</div>
+  <div id="flash"></div>
+  <audio id="enterSound" src="enter_sound.wav" preload="auto" volume="0.5"></audio>
+  <audio id="countdownStartSound" src="countdown_start.wav" preload="auto"></audio>
+  <audio id="specialSound" src="input_special.wav" preload="auto"></audio>
+
+  <div id="laserImpact"></div>
+
+</body>
+</html>
