@@ -42,7 +42,7 @@
     #countdownContainer {
       display: none;
       text-align: center;
-      font-size: 100px;
+      font-size: 75px;
       margin-top: 30px;
     }
 
@@ -101,7 +101,7 @@
   bottom: 0;
   width: 100vw;
   height: 100vh;
-  background: white;
+  background: red;
   opacity: 0;
   pointer-events: none;
   z-index: 3000;
@@ -130,7 +130,7 @@
   margin-top: -120px;
   display: none;
   text-align: center;
-  font-size: 100px;
+  font-size: 75px;
   color: #00ffcc;
   opacity: 0;
   transition: opacity 1s ease-in;
@@ -156,7 +156,7 @@
   margin-top: 10px;
   display: none;
   text-align: center;
-  font-size: 48px;
+  font-size: 30px;
   color: #00ffcc;
   opacity: 0;
   transition: opacity 0.5s ease-in;
@@ -183,6 +183,54 @@
   100% { opacity: 0; }
 }
 
+
+#hudOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 255, 204, 0.1);
+  border: 2px solid #00ffcc;
+  z-index: 3000;
+  display: none;
+  pointer-events: none;
+}
+
+#hitText {
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 60px;
+  color: red;
+  font-weight: bold;
+  text-shadow: 0 0 20px red;
+  z-index: 3002;
+  display: none;
+}
+
+
+
+@font-face {
+  font-family: 'Gallaudet';
+  src: url('gallaudet.ttf') format('truetype');
+}
+
+
+#interpreterFlash {
+  text-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+  position: fixed;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 400px;
+  font-family: 'Gallaudet', sans-serif;
+  color: #00ffcc;
+  z-index: 4000;
+  display: none;
+}
+
 </style>
 </head>
 <body id="body">
@@ -191,8 +239,14 @@
   <select id="transmissionSelect">
     <option value="transmission1">Transmission 1: The Signal Begins</option>
     <option value="transmission2">Transmission 2: To the Stars</option>
+    <option value="transmission3">Transmission 3: Placeholder</option>
+    <option value="transmission4">Transmission 4: Placeholder</option>
     <option value="transmission5">Transmission 5: [REDACTED]</option>
     <option value="transmission6">Transmission 6: Cipher</option>
+    <option value="transmission7">Transmission 7: Placeholder</option>
+    <option value="transmission8">Transmission 8: Placeholder</option>
+    <option value="transmission9">Transmission 9: Placeholder</option>
+    <option value="transmission10">Transmission 10: Placeholder</option>
   </select><br>
 
   <input type="text" id="userInput" placeholder="Type 'hint' or... something else?">
@@ -221,6 +275,27 @@
         "This message was definitely intended for Agent Finkle. It confirms her defection… something about space plants? Still, it feels like there’s enough intel here to crack the code.",
         "Wow. Nerds. The transmission appears to be written in Aurebesh—the Star Wars alphabet. Looks like the aliens were pointing her to a specific location online."
       ],
+
+      transmission3: [
+        "Placeholder message for Transmission 3. Hints will be added soon."
+      ],
+
+      transmission4: [
+        "Placeholder message for Transmission 4. Hints will be added soon."
+      ],
+
+      transmission7: [
+        "Placeholder message for Transmission 7. Hints will be added soon."
+      ],
+      transmission8: [
+        "Placeholder message for Transmission 8. Hints will be added soon."
+      ],
+      transmission9: [
+        "Placeholder message for Transmission 9. Hints will be added soon."
+      ],
+      transmission10: [
+        "Placeholder message for Transmission 10. Hints will be added soon."
+      ],
       transmission5: [
         "Redacted lines. Tampered data. Focus not on what’s there—but what isn’t. Four transmissions before this one, each interfered with.",
         "Records suggest Agent Finkle is behind the censorship. But perhaps the true clue lies not in what was hidden, but in how *much* was hidden.",
@@ -233,6 +308,7 @@
       ],
       transmission2: [
         "Everything you need is written in the stars. Maybe we can capitalize on that—especially when paired with the transmission data.",
+        "Everything you need is written in the stars. Maybe we can capitalize on that—especially when paired with the transmission data.",
         "Binary Light Analysis Celestial Knowledge and Location Identification Glowing Hidden Transmissions. Long. Overcomplicated. Possibly a code?",
         "Some truths hide in plain light. Others... require black light. Try scanning the stars again—something might glow."
       ]
@@ -240,6 +316,27 @@
 
     let currentHints = [];
     let hintIndex = 0;
+
+function triggerAirsoftHit() {
+  const hud = document.getElementById('hudOverlay');
+  const hitText = document.getElementById('hitText');
+  const flash = document.getElementById('flash');
+
+  hud.style.display = 'block';
+
+
+  setTimeout(() => {
+    flash.classList.add('flash-active');
+    hitText.style.display = 'block';
+    setTimeout(() => flash.classList.remove('flash-active'), 75);
+  }, 350);
+
+  setTimeout(() => {
+  hud.style.display = 'none';
+  hitText.style.display = 'none';
+}, 750);
+}
+
 
     const specialResponses = {
       'amy': "Agent A.M.Y. is classified. But since you asked… she’s not just an algorithm. She’s listening. Always.",
@@ -251,12 +348,15 @@
       'val': "404: Identity not found. Please consult Galactic Landlord John in the Afterlife Galaxy for clearance-level clarification.",
       'gamera': "Gamera, the Shelled One who created Earth.",
       'alien': "Those guys are totally chill. Absolutely no intention of harnessing Earth's deliciously warm, energy-rich core. Nope, none at all. All hail supreme Lord Zenu!",
-      'finkle': "Lover of plants and knowledge. Thrower of some of the best parties on Earth."
-    };
+      'finkle': "Lover of plants and knowledge. Thrower of some of the best parties on Earth.",
+  '1987': "The year of creation.",
+  'airsoft': "Airsoft? A low-impact training tool… or the last line of defense when real plasma rounds are off the table.",
+  'raven fox': "Not a raven. Not a fox. Definitely a problem for intergalactic security.",
+  'lisa': "Lisa: Top-tier reflexes. Unmatched hand-eye coordination. Rumor has it she once beat an alien invasion... with a joystick.",};
 
     function handleInput() {
       const inputVal = document.getElementById('userInput').value.trim().toLowerCase();
-      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy'];
+      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy', '1987', 'airsoft', 'raven fox', 'lisa'];
       const enterSound = document.getElementById("enterSound");
       const specialSound = document.getElementById("specialSound");
 
@@ -291,7 +391,61 @@
         } else {
           botMsg.textContent = "No further hints available for this transmission.";
         }
-      } else if (specialResponses[input]) {
+      
+  } else if (input === 'interpreter') {
+    
+    specialSound.volume = 0.25;
+    specialSound.play();
+
+    const msg = "DIDYOUCATCHALLOFTHAT";
+    const flash = document.getElementById('interpreterFlash');
+    let i = 0;
+    flash.style.display = 'block';
+    flash.textContent = '';
+
+    const interval = setInterval(() => {
+      if (i < msg.length) {
+        flash.textContent = msg[i];
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          flash.style.display = 'none';
+        }, 500);
+      }
+    }, 50);
+
+  } else if (input === 'airsoft') {
+    botMsg.textContent = specialResponses[input];
+    triggerAirsoftHit();
+  
+  } else if (input === 'interpreter') {
+    
+    specialSound.volume = 0.25;
+    specialSound.play();
+
+    const msg = "DIDYOUCATCHALLOFTHAT";
+    const flash = document.getElementById('interpreterFlash');
+    let i = 0;
+    flash.style.display = 'block';
+    flash.textContent = '';
+
+    const interval = setInterval(() => {
+      if (i < msg.length) {
+        flash.textContent = msg[i];
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          flash.style.display = 'none';
+        }, 500);
+      }
+    }, 50);
+
+  } else if (input === 'airsoft') {
+    botMsg.textContent = specialResponses[input];
+    triggerAirsoftHit();
+  } else if (specialResponses[input]) {
         botMsg.textContent = specialResponses[input];
       
   } else if (input === 'yogurt mommy') {
@@ -360,7 +514,29 @@
               missionMsg.style.opacity = '1';
             }, 50);
 
-            // Show 'HAPPY BIRTHDAY' 1 second after MISSION COMPLETE fades in
+            
+function triggerAirsoftHit() {
+  const hud = document.getElementById('hudOverlay');
+  const hitText = document.getElementById('hitText');
+  const flash = document.getElementById('flash');
+
+  hud.style.display = 'block';
+
+
+  setTimeout(() => {
+    flash.classList.add('flash-active');
+    hitText.style.display = 'block';
+    setTimeout(() => flash.classList.remove('flash-active'), 75);
+  }, 350);
+
+  setTimeout(() => {
+  hud.style.display = 'none';
+  hitText.style.display = 'none';
+}, 750);
+}
+
+
+// Show 'HAPPY BIRTHDAY' 1 second after MISSION COMPLETE fades in
             setTimeout(() => {
               const birthdayMsg = document.getElementById('happyBirthday');
               birthdayMsg.style.display = 'block';
@@ -406,5 +582,12 @@
 
   <div id="laserImpact"></div>
 
+
+  <div id="hudOverlay"></div>
+    <div id="hitText">HIT!</div>
+
+
+<div id="interpreterFlash"></div>
 </body>
+
 </html>
