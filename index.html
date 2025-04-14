@@ -42,7 +42,7 @@
     #countdownContainer {
       display: none;
       text-align: center;
-      font-size: 75px;
+      font-size: 70px;
       margin-top: 30px;
     }
 
@@ -130,7 +130,7 @@
   margin-top: -120px;
   display: none;
   text-align: center;
-  font-size: 75px;
+  font-size: 70px;
   color: #00ffcc;
   opacity: 0;
   transition: opacity 1s ease-in;
@@ -415,6 +415,42 @@ function triggerAirsoftHit() {
       }
     }, 50);
 
+  
+  } else if (input === 'quantum reaper') {
+        specialSound.volume = 0.25;
+    specialSound.play();
+    const qrImage = document.createElement('img');
+    qrImage.src = 'reaper.jpg';
+    qrImage.style.maxWidth = '300px';
+    qrImage.style.display = 'block';
+    qrImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(qrImage);
+
+  
+  } else if (input === 'bartender') {
+    specialSound.volume = 0.25;
+    specialSound.play();
+    const btImage = document.createElement('img');
+    btImage.src = 'bartender.jpg';
+    btImage.style.maxWidth = '300px';
+    btImage.style.display = 'block';
+    btImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(btImage);
+
+  
+  } else if (input === 'zenu') {
+    specialSound.volume = 0.25;
+    specialSound.play();
+    const zenuImage = document.createElement('img');
+    zenuImage.src = 'zenu.jpg';
+    zenuImage.style.maxWidth = '300px';
+    zenuImage.style.display = 'block';
+    zenuImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(zenuImage);
+
   } else if (input === 'airsoft') {
     botMsg.textContent = specialResponses[input];
     triggerAirsoftHit();
@@ -441,6 +477,42 @@ function triggerAirsoftHit() {
         }, 500);
       }
     }, 50);
+
+  
+  } else if (input === 'quantum reaper') {
+        specialSound.volume = 0.25;
+    specialSound.play();
+    const qrImage = document.createElement('img');
+    qrImage.src = 'reaper.jpg';
+    qrImage.style.maxWidth = '300px';
+    qrImage.style.display = 'block';
+    qrImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(qrImage);
+
+  
+  } else if (input === 'bartender') {
+    specialSound.volume = 0.25;
+    specialSound.play();
+    const btImage = document.createElement('img');
+    btImage.src = 'bartender.jpg';
+    btImage.style.maxWidth = '300px';
+    btImage.style.display = 'block';
+    btImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(btImage);
+
+  
+  } else if (input === 'zenu') {
+    specialSound.volume = 0.25;
+    specialSound.play();
+    const zenuImage = document.createElement('img');
+    zenuImage.src = 'zenu.jpg';
+    zenuImage.style.maxWidth = '300px';
+    zenuImage.style.display = 'block';
+    zenuImage.style.marginTop = '10px';
+    botMsg.textContent = " ";
+    botMsg.appendChild(zenuImage);
 
   } else if (input === 'airsoft') {
     botMsg.textContent = specialResponses[input];
