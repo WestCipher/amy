@@ -352,13 +352,27 @@ function triggerAirsoftHit() {
   '1987': "The year of creation.",
   'airsoft': "Airsoft? A low-impact training tool… or the last line of defense when real plasma rounds are off the table.",
   'raven fox': "Not a raven. Not a fox. Definitely a problem for intergalactic security.",
-  'lisa': "Lisa: Top-tier reflexes. Unmatched hand-eye coordination. Rumor has it she once beat an alien invasion... with a joystick.",};
+  'lisa': "Lisa: Top-tier reflexes. Unmatched hand-eye coordination. Rumor has it she once beat an alien invasion... with a joystick.",
+  '1732': "Uplink vector aligned – channel fully operational.",
+  'earth': "Earth: orbital speed ~29.8 km/s. Political drama: off the charts. Recommend viewing from a safe distance.",};
 
     function handleInput() {
       const inputVal = document.getElementById('userInput').value.trim().toLowerCase();
-      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy', '1987', 'airsoft', 'raven fox', 'lisa'];
+      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy', '1987', 'airsoft', 'raven fox', 'lisa','1732','earth'];
       const enterSound = document.getElementById("enterSound");
       const specialSound = document.getElementById("specialSound");
+      if (inputVal === 'quantum override') {
+        const mazeSound = document.getElementById('mazeSound');
+        mazeSound.play();
+        specialSound.volume = 0.25;
+        specialSound.play();
+        document.getElementById('transmissionSelect').style.display = 'none';
+        document.getElementById('userInput').style.display = 'none';
+        document.querySelector('button').style.display = 'none';
+        document.getElementById('chat').style.display = 'none';
+        showMaze();
+        return;
+      }
 
       if (specialInputs.includes(inputVal)) {
         specialSound.volume = 0.25;
@@ -529,6 +543,9 @@ function triggerAirsoftHit() {
     botMsg.textContent = " ";
     botMsg.appendChild(yogurtImage);
 } else if (input === 'fire the cannon') {
+      const oldMsg = document.getElementById('successMsg');
+        if (oldMsg) oldMsg.remove();
+
         const cannonSound = document.getElementById("cannonSound");
         cannonSound.currentTime = 0;
         cannonSound.volume = 0.5;
@@ -546,6 +563,7 @@ function triggerAirsoftHit() {
 
     function triggerCannonCountdown() {
       const specialSound = document.getElementById("specialSound");
+      
       specialSound.volume = 0.25;
       specialSound.play();
       const countdownStartSound = document.getElementById("countdownStartSound");
@@ -651,6 +669,9 @@ function triggerAirsoftHit() {
   <audio id="enterSound" src="enter_sound.wav" preload="auto" volume="0.5"></audio>
   <audio id="countdownStartSound" src="countdown_start.wav" preload="auto"></audio>
   <audio id="specialSound" src="input_special.wav" preload="auto"></audio>
+  <audio id="mazeSound" src="maze.wav" preload="auto"></audio>
+  <audio id="wallSound" src="wall.wav" preload="auto"></audio>
+  <audio id="finishSound" src="finish.wav" preload="auto"></audio>
 
   <div id="laserImpact"></div>
 
@@ -660,6 +681,124 @@ function triggerAirsoftHit() {
 
 
 <div id="interpreterFlash"></div>
+<!-- MAZE WRAPPER (hidden until triggered) -->
+<div id="mazeWrapper" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0d0d0d; z-index:5000; padding:20px; box-sizing:border-box; overflow:hidden; display:none; flex-direction:column;">
+  <div id="mazeHud" style="display:flex; justify-content:space-between; color:#00ffcc; font-family:'Courier New',monospace; margin-bottom:10px;">
+    <div id="mazeTimer">10:00</div>
+    <div id="mazeMessage">Hover top-left to START</div>
+  </div>
+  <div id="mazeContainer" style="position:relative; flex:1; display:flex; align-items:center; justify-content:center;">
+    <div id="mazeFlash" style="position:absolute; top:0; left:0; width:100%; height:100%; background:red; opacity:0; pointer-events:none; transition:opacity 0.2s ease;"></div>
+    <canvas id="mazeCanvas" width="600" height="600" style="background:#1a1a1a; box-shadow:0 0 20px #00ffcc; cursor:crosshair;"></canvas>
+  </div>
+</div>
+<script>
+;(function(){
+  const wrapper = document.getElementById('mazeWrapper');
+  const canvas  = document.getElementById('mazeCanvas');
+  const ctx     = canvas.getContext('2d');
+  const timerEl = document.getElementById('mazeTimer');
+  const msgEl   = document.getElementById('mazeMessage');
+  const flash   = document.getElementById('mazeFlash');
+  const W = canvas.width, H = canvas.height;
+  const COLS = 30, ROWS = 30, CELL = W/ COLS;
+  const grid = Array.from({length:ROWS}, (_,r)=> Array.from({length:COLS},(_,c)=>({top:true,right:true,bottom:true,left:true,visited:false})));
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+  function carve(r,c){
+    grid[r][c].visited = true;
+    shuffle(['top','right','bottom','left']).forEach(dir=>{
+      let nr=r+(dir==='bottom')-(dir==='top'), nc=c+(dir==='right')-(dir==='left');
+      if(nr<0||nr>=ROWS||nc<0||nc>=COLS||grid[nr][nc].visited) return;
+      grid[r][c][dir]=false;
+      grid[nr][nc][{top:'bottom',bottom:'top',left:'right',right:'left'}[dir]] = false;
+      carve(nr,nc);
+    });
+  }
+  carve(0,0);
+  function draw(){
+    ctx.fillStyle='#1a1a1a'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='#00ffcc'; ctx.lineWidth=2;
+    for(let r=0;r<ROWS;r++){ for(let c=0;c<COLS;c++){
+      const x=c*CELL, y=r*CELL, cell=grid[r][c];
+      if(cell.top){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+CELL,y); ctx.stroke(); }
+      if(cell.right){ ctx.beginPath(); ctx.moveTo(x+CELL,y); ctx.lineTo(x+CELL,y+CELL); ctx.stroke(); }
+      if(cell.bottom){ ctx.beginPath(); ctx.moveTo(x+CELL,y+CELL); ctx.lineTo(x,y+CELL); ctx.stroke(); }
+      if(cell.left){ ctx.beginPath(); ctx.moveTo(x,y+CELL); ctx.lineTo(x,y); ctx.stroke(); }
+    }}
+    ctx.fillStyle='#ffff99'; ctx.font=`bold ${CELL*0.4}px monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('START',CELL/2,CELL/2);
+    ctx.fillText('FINISH',W-CELL*0.75,H-CELL/2);
+  }
+  draw();
+  let playing=false, started=false, timeLeft=600, interval;
+  function updateTimer(){
+    const m=Math.floor(timeLeft/60), s=timeLeft%60;
+    timerEl.textContent=`${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+    if(--timeLeft<0){ clearInterval(interval); playing=false; msgEl.textContent='Initiating stall protocol'; }
+  }
+  function hitWall(){
+      const wallSound = document.getElementById('wallSound');
+      wallSound.play();
+    playing=false; flash.style.opacity=0.7;
+    setTimeout(()=>flash.style.opacity=0,200);
+    msgEl.textContent='Wall hit! Return to START to try again.';
+      // Reset grid cells
+      for (let rr = 0; rr < ROWS; rr++) {
+        for (let cc = 0; cc < COLS; cc++) {
+          grid[rr][cc] = { top: true, right: true, bottom: true, left: true, visited: false };
+        }
+      }
+      // Carve and redraw new maze
+      carve(0,0);
+      draw();
+  }
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect(), x=e.clientX-rect.left, y=e.clientY-rect.top;
+    if(!playing){
+      if(x<CELL&&y<CELL){ playing=true; msgEl.textContent='Go! Reach FINISH.'; if(!started){ started=true; updateTimer(); interval=setInterval(updateTimer,1000);} }
+      return;
+    }
+    const p=ctx.getImageData(x,y,1,1).data;
+    if(p[0]===0&&p[1]===255&&p[2]===204) return hitWall();
+    
+if(x>W-CELL&&y>H-CELL){
+      const finishSound = document.getElementById('finishSound');
+      finishSound.play();
+      clearInterval(interval);
+      playing=false;
+      // Hide maze and restore interface
+      wrapper.style.display='none';
+      document.getElementById('transmissionSelect').style.display='inline-block';
+      document.getElementById('userInput').style.display='inline-block';
+      document.querySelector('button').style.display='inline-block';
+      document.getElementById('chat').style.display='block';
+      // Show success overlay
+      const successMsg = document.createElement('div');
+      successMsg.id = 'successMsg';
+      successMsg.innerHTML = 'success - input: "<strong>fire the cannon</strong>" to finish';
+      Object.assign(successMsg.style, {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: '#00ffcc',
+        background: '#0d0d0d',
+        padding: '10px',
+        border: '1px solid #00ffcc',
+        fontFamily: 'Courier New, monospace',
+        zIndex: 6000,
+        textAlign: 'center'
+      });
+      document.body.appendChild(successMsg);
+      
+    }
+
+  });
+  canvas.addEventListener('mouseleave',()=>{ if(playing) hitWall(); });
+  window.showMaze=()=>wrapper.style.display='flex';
+})();
+</script>
 </body>
 
 </html>
