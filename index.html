@@ -354,13 +354,16 @@ function triggerAirsoftHit() {
   'raven fox': "Not a raven. Not a fox. Definitely a problem for intergalactic security.",
   'lisa': "Lisa: Top-tier reflexes. Unmatched hand-eye coordination. Rumor has it she once beat an alien invasion... with a joystick.",
   '1732': "Uplink vector aligned – channel fully operational.",
-  'earth': "Earth: orbital speed ~29.8 km/s. Political drama: off the charts. Recommend viewing from a safe distance.",};
+  'earth': "Earth: orbital speed ~29.8 km/s. Political drama: off the charts. Recommend viewing from a safe distance.",
+  'morse': "audio transmitting"
+};
 
     function handleInput() {
       const inputVal = document.getElementById('userInput').value.trim().toLowerCase();
-      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy', '1987', 'airsoft', 'raven fox', 'lisa','1732','earth'];
+      const specialInputs = ['amy','nathan','help','buzz','nugget','shannon','val','gamera','alien','finkle','yogurt mommy', '1987', 'airsoft', 'raven fox', 'lisa','1732','earth','morse'];
       const enterSound = document.getElementById("enterSound");
       const specialSound = document.getElementById("specialSound");
+      
       if (inputVal === 'quantum override') {
         const mazeSound = document.getElementById('mazeSound');
         mazeSound.play();
@@ -374,13 +377,18 @@ function triggerAirsoftHit() {
         return;
       }
 
-      if (specialInputs.includes(inputVal)) {
+      if (inputVal === 'morse') {
+        const morseSound = new Audio('morse.wav');
+        morseSound.volume = 0.5;
+        morseSound.play();
+      } else if (specialInputs.includes(inputVal)) {
         specialSound.volume = 0.25;
         specialSound.play();
       } else {
         enterSound.volume = 0.25;
         enterSound.play();
       }
+
       
       const input = document.getElementById('userInput').value.trim().toLowerCase();
       const chat = document.getElementById('chat');
