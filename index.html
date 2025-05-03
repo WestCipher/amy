@@ -378,15 +378,63 @@ function triggerAirsoftHit() {
       const specialSound = document.getElementById("specialSound");
       
       if (inputVal === 'quantum override') {
-        const mazeSound = document.getElementById('mazeSound');
-        mazeSound.play();
-        specialSound.volume = 0.25;
-        specialSound.play();
-        document.getElementById('transmissionSelect').style.display = 'none';
-        document.getElementById('userInput').style.display = 'none';
-        document.querySelector('button').style.display = 'none';
-        document.getElementById('chat').style.display = 'none';
-        showMaze();
+        // Create styled lock overlay
+        const lockOverlay = document.createElement('div');
+        lockOverlay.id = 'lockOverlay';
+        lockOverlay.innerHTML = `
+          <p id="lockMessage">broken lock detected - input solution for transmission #1 to continue</p>
+          <input type="text" id="lockInput" placeholder="CODE" style="margin-top:10px;"><br>
+          <button id="lockBtn" style="margin-top:10px;">ENTER</button>
+          <p id="lockError" style="color:#ff5555; display:none; margin-top:10px; font-family:Courier New, monospace;">incorrect code. access denied.</p>
+        `;
+        Object.assign(lockOverlay.style, {
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#00ffcc',
+          background: '#0d0d0d',
+          padding: '20px',
+          border: '1px solid #00ffcc',
+          fontFamily: 'Courier New, monospace',
+          zIndex: 6000,
+          textAlign: 'center'
+        });
+        document.body.appendChild(lockOverlay);
+
+        // Prepare sounds
+        const correctSound = new Audio('input_special.wav');
+        const incorrectSound = new Audio('wall.wav');
+
+        function checkCode() {
+          const codeInput = document.getElementById('lockInput').value.trim();
+          const lockError = document.getElementById('lockError');
+          if (codeInput === '1987') {
+            // Play correct sound and launch maze
+            correctSound.play();
+            lockOverlay.remove();
+            const mazeSound = document.getElementById('mazeSound');
+            mazeSound.play();
+            specialSound.volume = 0.25;
+            specialSound.play();
+            document.getElementById('transmissionSelect').style.display = 'none';
+            document.getElementById('userInput').style.display = 'none';
+            document.querySelector('button').style.display = 'none';
+            document.getElementById('chat').style.display = 'none';
+            showMaze();
+          } else {
+            // Play incorrect sound and show styled error
+            incorrectSound.play();
+            lockError.style.display = 'block';
+          }
+        }
+
+        document.getElementById('lockBtn').addEventListener('click', checkCode);
+        document.getElementById('lockInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            checkCode();
+          }
+        });
         return;
       }
 
